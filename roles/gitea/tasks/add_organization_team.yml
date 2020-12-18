@@ -1,0 +1,19 @@
+---
+- include_tasks: check_organization_teams.yml
+
+- name: "Add a team in organization {{ item.team }} in organiztion {{ item.organization }} "
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/orgs/{{ item.organization }}/teams?token={{ gitea_service_token }}"
+    return_content: true
+    method: POST
+    body: |
+      { "can_create_org_repo": true, "description": "{{ item.description }}", "includes_all_repositories": true,
+      "name": "{{ item.team }}", "permission": "{{ item.permission }}",
+      "units": ["repo.code", "repo.issues", "repo.ext_issues",
+      "repo.wiki", "repo.pulls", "repo.releases", "repo.ext_wiki" ] }
+    body_format: json
+    status_code:
+      - 201
+  register: exists_teams
+  changed_when: exists_teams.status == 201
+  when: team_id | length == 0

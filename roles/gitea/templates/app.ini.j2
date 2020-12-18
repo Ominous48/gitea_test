@@ -1,0 +1,65 @@
+APP_NAME = {{ gitea_service_appname }}
+RUN_USER = {{ gitea_service_username }}
+RUN_MODE = prod
+
+[security]
+INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE2MDgyMDAzMzZ9.DvEeGGVe0tStCivn-wMSJJ0nhu5lvf0tJGBygZKQn_M
+INSTALL_LOCK   = true
+SECRET_KEY     = qwerty12345
+
+[database]
+DB_TYPE  = {{ gitea_db_type }}
+HOST     = {{ gitea_db_host }}
+NAME     = {{ gitea_db_name }}
+USER     = {{ gitea_db_user }}
+PASSWD   = {{ gitea_db_passwd }}
+SCHEMA   = {{ gitea_db_schema }}
+SSL_MODE = {{ gitea_db_ssl_mode }}
+CHARSET  = {{ gitea_db_charset }}
+PATH     = {{ gitea_db_path }}
+LOG_SQL  = false
+
+[repository]
+ROOT = {{ gitea_repository_root }}
+
+[server]
+SSH_DOMAIN       = {{ gitea_server_ssh_domain }}
+DOMAIN           = {{ gitea_server_domain }}
+HTTP_ADDR        = {{ gitea_server_http_addr }}
+HTTP_PORT        = {{ gitea_server_http_port }}
+ROOT_URL         = {{ gitea_server_root_url }}
+SSH_PORT         = {{ gitea_server_ssh_port }}
+PROTOCOL         = {{ gitea_protocol }}
+
+[mailer]
+ENABLED = false
+
+[service]
+REGISTER_EMAIL_CONFIRM            = false
+ENABLE_NOTIFY_MAIL                = false
+DISABLE_REGISTRATION              = false
+ALLOW_ONLY_EXTERNAL_REGISTRATION  = false
+ENABLE_CAPTCHA                    = false
+REQUIRE_SIGNIN_VIEW               = false
+DEFAULT_KEEP_EMAIL_PRIVATE        = false
+DEFAULT_ALLOW_CREATE_ORGANIZATION = true
+DEFAULT_ENABLE_TIMETRACKING       = true
+NO_REPLY_ADDRESS                  = noreply.localhost
+
+[picture]
+DISABLE_GRAVATAR        = false
+ENABLE_FEDERATED_AVATAR = true
+
+[session]
+PROVIDER = file
+
+[log]
+MODE                 = console
+LEVEL                = info
+ROOT_PATH            = {{ gitea_service_workdir }}/log
+REDIRECT_MACARON_LOG = true
+MACARON              = console
+ROUTER               = console
+
+[oauth2]
+ENABLE        = false

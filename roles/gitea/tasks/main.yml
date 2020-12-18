@@ -1,0 +1,47 @@
+---
+# tasks file for gitea
+
+- name: "Install gitea for Rhel OS"
+  block:
+
+    # Install GIT for for correct work of gitea
+    - name: "Install git"
+      package:
+          state: present
+          name: git
+
+    # Install Gitea binary and setup service
+    - include_tasks: install_and_config_gitea.yml
+
+    # Add admin service user
+    - include_tasks: add_admin_user.yml
+
+    # Add admin service token for api calls
+    - include_tasks: add_service_token.yml
+
+    # Add organizations from variables
+    - include_tasks: add_organization.yml
+      with_items: "{{ gitea_organizations }}"
+      when: gitea_organizations | length > 0
+
+    # Add users from variables
+    - include_tasks: add_user.yml
+      with_items: "{{ gitea_users }}"
+      when: gitea_users | length > 0
+
+    # Add organization teams from variables
+    - include_tasks: add_organization_team.yml
+      with_items: "{{ gitea_organization_teams }}"
+      when: gitea_organization_teams | length > 0
+
+    # Add users to organization from variables
+    - include_tasks: add_to_organization.yml
+      with_items: "{{ gitea_organization_members }}"
+      when: gitea_organization_members | length > 0
+
+    # Add organization repo from variables
+    - include_tasks: add_repo_to_organization.yml
+      with_items: "{{ gitea_organization_repo }}"
+      when: gitea_organization_repo | length > 0
+  
+  when: ansible_os_family == 'RedHat'

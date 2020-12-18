@@ -1,0 +1,22 @@
+---
+
+- name: "Playbook for install gitea on host"
+  connection: local
+  hosts: localhost
+  gather_facts: True
+  vars_files:
+    - vars.yml
+  tasks:
+
+    - name: "Include role Postgresql"
+      include_role:
+        name: postgresql
+      # when: 
+      #   - gitea_db_type == "postgres"
+      #   - not postgres_manual_setup
+
+    - name: "Inlcude role Gitea"
+      include_role:
+        name: gitea
+
+    

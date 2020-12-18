@@ -1,0 +1,48 @@
+---
+- name: "Check if a service user {{gitea_service_admin_user}} exists "
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/users/{{gitea_service_admin_user}}"
+    return_content: true
+    method: GET
+    force_basic_auth: true
+    status_code:
+      - 200
+      - 404
+  register: exists_service_users
+
+- name: "Check if a password for a service user {{gitea_service_admin_user}} is correct"
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/admin/orgs"
+    return_content: true
+    method: GET
+    user: "{{gitea_service_admin_user}}"
+    password: "{{gitea_service_admin_password}}"
+    force_basic_auth: true
+    status_code:
+      - 401
+      - 200
+  register: auth_status
+  when: exists_service_users.json.username is defined
+
+- name: "Change a service user {{ gitea_service_admin_user }} password if need"
+  shell: >
+    /usr/local/bin/gitea admin change-password --username {{ gitea_service_admin_user }}
+    --password {{ gitea_service_admin_password }} --config /etc/gitea/app.ini
+  args:
+    executable: /bin/bash
+  register: admin_output
+  become: true
+  become_user: gitea
+  when: exists_service_users.json.username is defined and auth_status.status == 401
+
+- name: "Create admin service user {{ gitea_service_admin_user }}"
+  shell: >
+    /usr/local/bin/gitea admin create-user --username {{ gitea_service_admin_user }}
+    --password {{ gitea_service_admin_password }} --email {{ gitea_service_admin_email }}
+    --admin --must-change-password=false --config /etc/gitea/app.ini
+  args:
+    executable: /bin/bash
+  register: admin_output
+  become: true
+  become_user: gitea
+  when: exists_service_users.json.username is not defined

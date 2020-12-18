@@ -1,0 +1,30 @@
+---
+
+- name: "Check if a repository {{ item.repo }} in organiztion {{ item.organization }}"
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/orgs/{{ item.organization }}/repos?token={{ gitea_service_token }}"
+    return_content: true
+    method: GET
+    status_code:
+      - 200
+      - 404
+  register: exists_organization_repo
+
+- name: "Get repo id for repository {{ item.repo }} if exists"
+  set_fact:
+    repo_id: "{{ exists_organization_repo | json_query(query) | join('\n') }}"
+  vars:
+    query: "json[?name=='{{ item.repo }}'].id"
+
+- name: "Add a repository {{ item.repo }} in organization {{ item.organization }}"
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/orgs/{{ item.organization }}/repos?token={{ gitea_service_token }}"
+    return_content: true
+    method: POST
+    body: { "default_branch": "{{ item.default_branch }}", "description": "{{ item.description }}", "name": "{{ item.repo }}", "private": "{{ item.private }}", "template": "{{ item.template }}" }
+    body_format: json
+    status_code:
+      - 201
+  register: exists_organization_repo
+  changed_when: exists_organization_repo.status == 201
+  when: repo_id | length == 0

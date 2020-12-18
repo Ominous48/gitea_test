@@ -1,0 +1,71 @@
+---
+gitea_service_appname: "Gitea: Welcome to VTB2222"
+
+#Comment this block to get sqlite3 Database
+gitea_db_type: postgres
+gitea_db_host: 127.0.0.1:5432
+gitea_db_name: gitea
+gitea_db_user: gitea
+gitea_db_passwd: password12345
+gitea_db_ssl_mode: disable
+gitea_db_charset: utf8
+gitea_db_path: /opt/gitea/data/gitea.db
+gitea_db_schema: "public"
+
+gitea_server_domain: 172.19.11.115
+gitea_server_http_addr: 172.19.11.115
+gitea_server_http_port: 3000
+gitea_server_root_url: http://172.19.11.115:3000
+gitea_server_ssh_port: 22
+gitea_server_ssh_domain: localhost
+
+gitea_service_admin_user: serviceuser
+gitea_service_admin_password: serviceuser5
+gitea_service_admin_email: serviceuser@example.com
+
+gitea_users:
+  - name: "jdoe"
+    password: qwerty
+    email: jdoe@example.com
+    full_name: "John Doe"
+  - name: "msmith"
+    password: qwerty
+    email: msmith@example.com
+    full_name: "Mary Smith"
+
+gitea_organizations:
+  - name: example.com
+    description: example.com
+    visibility: public
+
+gitea_organization_teams:
+  - organization: example.com
+    team: Members
+    permission: write
+    description: "New team"
+
+gitea_organization_members:
+  - username: jdoe
+    organization: example.com
+    team: Members
+  - username: msmith
+    organization: example.com
+    team: Members
+
+gitea_organization_repo:
+  - repo: foobar
+    organization: example.com
+    default_branch: master
+    description: "Repo for example.com organization"
+    private: false
+    template: false
+
+postgresql_users:
+  - name: gitea
+    password: password12345
+
+postgresql_databases:
+  - name: gitea
+    owner: gitea
+
+postgres_manual_setup: false

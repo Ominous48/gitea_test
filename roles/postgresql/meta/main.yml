@@ -1,0 +1,10 @@
+---
+
+galaxy_info:
+  author: Ramires Andrei
+  description: Role for install postgres server
+  company: mycompany
+  license: license (GPL-2.0-or-later, MIT, etc)
+  min_ansible_version: 2.9
+  galaxy_tags: []
+dependencies: []

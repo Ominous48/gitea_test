@@ -1,0 +1,61 @@
+---
+- name: "Create user {{ gitea_service_username }} for gitea"
+  user:
+      name: "{{ gitea_service_username }}"
+      create_home: false
+      home: "{{ gitea_service_home_dir }}"
+      shell: /bin/bash
+      state: present
+
+- name: "Create working folder for gitea"
+  file:
+      path: "{{ item.folder }}"
+      group: "{{ item.group }}"
+      state: directory
+      owner: "{{ item.owner }}"
+      mode: "{{ item.mode }}"
+  loop:
+      - {folder: "{{ gitea_service_workdir }}", mode: '750', group: "{{ gitea_service_group }}", owner: "{{ gitea_service_username }}"}
+      - {folder: "{{ gitea_service_workdir }}/custom", mode: '750', group: "{{ gitea_service_group }}", owner: "{{ gitea_service_username }}"}
+      - {folder: "{{ gitea_service_workdir }}/data", mode: '750', group: "{{ gitea_service_group }}", owner: "{{ gitea_service_username }}"}
+      - {folder: "{{ gitea_service_workdir }}/log", mode: '750', group: "{{ gitea_service_group }}", owner: "{{ gitea_service_username }}"}
+      - {folder: '/etc/gitea', mode: '750', group: "{{ gitea_service_group }}", owner: 'root'}
+
+- name: "Download gitea binary to folder {{ gitea_service_binary_version }}"
+  get_url:
+      dest: "{{ gitea_service_binary_path }}/gitea"
+      url: "https://dl.gitea.io/gitea/{{ gitea_service_binary_version }}/gitea-{{ gitea_service_binary_version }}-linux-amd64"
+      mode: +x
+  notify:
+      - "Restart gitea systemd service"
+
+- name: "Copy gitea config file to /etc/gitea"
+  template:
+      src: app.ini.j2
+      dest: /etc/gitea/app.ini
+      owner: root
+      group: root
+      mode: 0777
+  notify:
+      - "Restart gitea systemd service"
+
+- name: "Copy gitea service file to systemd folder"
+  template:
+      src: gitea.service.j2
+      dest: /etc/systemd/system/gitea.service
+  notify:
+      - "Restart gitea systemd service"
+
+- name: "Start and enable gitea systemd service"
+  systemd:
+      name: gitea
+      enabled: true
+      state: started
+
+- name: "Execute migrate before adding admin user in gitea"
+  shell: /usr/local/bin/gitea migrate --config /etc/gitea/app.ini
+  args:
+      executable: /bin/bash
+  become: true
+  become_user: gitea
+  changed_when: false

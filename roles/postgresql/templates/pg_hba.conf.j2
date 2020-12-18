@@ -1,0 +1,4 @@
+#Autocreated by Ansible. Don't change manually
+{% for hba_client in postgresql_pg_hba %}
+{{ hba_client.type }} {{ hba_client.database }} {{ hba_client.user }} {{ hba_client.address }} {{ hba_client.method }}
+{% endfor %}

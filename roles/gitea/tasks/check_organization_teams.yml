@@ -1,0 +1,16 @@
+---
+- name: "Get organization team {{ item.organization }} ids"
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/orgs/{{ item.organization }}/teams?token={{ gitea_service_token }}"
+    return_content: true
+    method: GET
+    status_code:
+      - 200
+      - 404
+  register: exists_teams
+
+- name: "Get organization team id for team {{ item.team }}"
+  set_fact:
+    team_id: "{{ exists_teams | json_query(query) | join('\n') }}"
+  vars:
+    query: "json[?name=='{{ item.team }}'].id"

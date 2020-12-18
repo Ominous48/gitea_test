@@ -1,0 +1,64 @@
+---
+# tasks file for postgresql
+
+- name: "Install PostgreSQL repo"
+  yum:
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+
+- name: "Install PostgreSQL{{ postgresql_version }} and PostgreSQL{{ postgresql_version }} server"
+  yum:
+    name:
+      - "postgresql{{ postgresql_version }}"
+      - "postgresql{{ postgresql_version }}-server"
+      - python-psycopg2
+    state: present
+
+- name: "Check if PostgreSQL is initialized"
+  stat:
+    path: /var/lib/pgsql/{{ postgresql_version }}/data/PG_VERSION
+  register: postgres_data
+
+- name: "Ensure PostgreSQL database is initialized."
+  command: "/usr/pgsql-{{ postgresql_version }}/bin/postgresql-{{ postgresql_version }}-setup initdb"
+  when: not postgres_data.stat.exists
+  # become: true
+
+- name: "Configure PostgreSQL HBA"
+  template:
+    src: "pg_hba.conf.j2"
+    dest: "/var/lib/pgsql/{{ postgresql_version }}/data/pg_hba.conf"
+    owner: "{{ postgresql_service_user }}"
+    group: "{{ postgresql_service_group }}"
+    mode: 0600
+  notify: restart PostgreSQL
+  when: postgresql_pg_hba | length > 0
+
+- name: "Enable and start service PostgreSQL"
+  systemd:
+    name: "postgresql-{{ postgresql_version }}"
+    enabled: true
+    state: started
+
+- name: "Create DB user {{ item.name }}"
+  postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    state: present
+  become: true
+  become_user: "{{ postgresql_service_user }}"
+  loop:
+    "{{ postgresql_users }}"
+
+- name: "Create databases if not exists"
+  postgresql_db:
+    name: "{{ item.name }}"
+    owner: "{{ item.owner | default(postgresql_service_user) }}"
+    state: present
+  with_items: "{{ postgresql_databases }}"
+  become: true
+  become_user: "{{ postgresql_service_user }}"
+  # vars:
+  #   ansible_ssh_pipelining: true
+
+- meta: flush_handlers

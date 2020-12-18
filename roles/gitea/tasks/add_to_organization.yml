@@ -1,0 +1,29 @@
+---
+- include_tasks: check_organization_teams.yml
+
+- name: "Check if an user {{ item.username }} in org {{ item.organization }}"
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/teams/{{ team_id }}/members?token={{ gitea_service_token }}"
+    return_content: true
+    method: GET
+    status_code:
+      - 200
+  register: exists_team_member
+  when: team_id | length > 0
+
+- name: "Get UID {{ item.username }} in organization {{ item.organization }}"
+  set_fact:
+    user_id: "{{ exists_team_member | json_query(query) | join('\n') }}"
+  vars:
+    query: "json[?username=='{{ item.username }}'].id"
+  when: exists_team_member is defined
+
+- name: "Move an user {{ item.username }} in org {{ item.organization }}"
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/teams/{{ team_id }}/members/{{ item.username }}?token={{ gitea_service_token }}"
+    return_content: true
+    method: PUT
+    status_code: 204
+  register: moved_user
+  changed_when: moved_user.status == 204
+  when: team_id | length > 0 and user_id | length == 0

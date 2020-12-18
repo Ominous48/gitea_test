@@ -1,0 +1,22 @@
+---
+- name: "Check if an user {{ item.name }} exists "
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/users/{{ item.name }}?token={{ gitea_service_token }}"
+    return_content: true
+    method: GET
+    status_code:
+      - 200
+      - 404
+  register: exists_user
+
+- name: "Create an user {{ item.name }} via API"
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/admin/users?token={{ gitea_service_token }}"
+    return_content: true
+    method: POST
+    body: { "email": "{{ item.email }}", "full_name": "{{ item.full_name }}", "login_name": "{{ item.name }}", "must_change_password": true, "password": "{{ item.password }}", "send_notify": true, "username": "{{ item.name }}" }
+    body_format: json
+    status_code: 201
+  register: created_user
+  changed_when: created_user.status == 201
+  when: "exists_user.json.username is not defined"

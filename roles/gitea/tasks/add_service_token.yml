@@ -1,0 +1,30 @@
+---
+- name: "Delete gitea service token for admin service user {{ gitea_service_admin_user }}"
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/users/{{gitea_service_admin_user}}/tokens/servicetoken"
+    return_content: true
+    method: DELETE
+    user: "{{gitea_service_admin_user}}"
+    password: "{{gitea_service_admin_password}}"
+    force_basic_auth: true
+    status_code:
+      - 204
+      - 404
+
+- name: "Create gitea service token for admin service user {{ gitea_service_admin_user }}"
+  uri:
+    url: "{{ gitea_server_root_url }}/api/v1/users/{{gitea_service_admin_user}}/tokens"
+    return_content: true
+    method: POST
+    body: {"name":"servicetoken"}
+    body_format: json
+    user: "{{ gitea_service_admin_user }}"
+    password: "{{ gitea_service_admin_password }}"
+    force_basic_auth: true
+    status_code:
+      - 201
+  register: service_token
+
+- name: "Set fact for service token"
+  set_fact:
+    gitea_service_token: "{{ service_token.json.sha1 }}"
