@@ -1,0 +1,26 @@
+---
+
+- name: "Playbook for install gitea on host"
+  hosts: gitea_hosts
+  gather_facts: True
+  become: true
+  vars_files:
+    - vars.yml
+  vars:
+    gitea_server_domain: "{{ ansible_ssh_host }}"
+    gitea_server_http_addr: "{{ ansible_ssh_host }}"
+    gitea_server_root_url: "http://{{ ansible_ssh_host }}:3000"
+  tasks:
+
+    - name: "Include role Postgresql"
+      include_role:
+        name: postgresql
+      when: 
+        - gitea_db_type == "postgres"
+        - not postgres_manual_setup
+
+    - name: "Inlcude role Gitea"
+      include_role:
+        name: gitea
+
+    

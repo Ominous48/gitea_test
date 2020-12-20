@@ -1,8 +1,8 @@
 ---
-gitea_service_appname: "Gitea: Welcome to VTB2222"
+gitea_service_appname: "Gitea: Welcome to Ramires Gitea instance"
 
-#Comment this block to get sqlite3 Database
-gitea_db_type: postgres
+#Change db type to sqlite3 if u want sqlite3 database as backend
+gitea_db_type: postgresql
 gitea_db_host: 127.0.0.1:5432
 gitea_db_name: gitea
 gitea_db_user: gitea
@@ -12,10 +12,10 @@ gitea_db_charset: utf8
 gitea_db_path: /opt/gitea/data/gitea.db
 gitea_db_schema: "public"
 
-gitea_server_domain: 172.19.11.115
-gitea_server_http_addr: 172.19.11.115
+# gitea_server_domain: 192.168.33.10
+# gitea_server_http_addr: 192.168.33.10
+# gitea_server_root_url: http://192.168.33.10:3000
 gitea_server_http_port: 3000
-gitea_server_root_url: http://172.19.11.115:3000
 gitea_server_ssh_port: 22
 gitea_server_ssh_domain: localhost
 

@@ -1,0 +1,7 @@
+[gitea_hosts]
+gitea ansible_host=192.168.33.10 ansible_port=22
+
+[gitea_hosts:vars]
+ansible_password=vagrant
+ansible_ssh_user=vagrant
+host_key_checking=False

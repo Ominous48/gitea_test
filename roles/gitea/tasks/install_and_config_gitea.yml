@@ -52,6 +52,10 @@
       enabled: true
       state: started
 
+- name: "Wait until service start"
+  pause:
+      seconds: 5
+
 - name: "Execute migrate before adding admin user in gitea"
   shell: /usr/local/bin/gitea migrate --config /etc/gitea/app.ini
   args:
