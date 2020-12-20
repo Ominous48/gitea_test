@@ -43,4 +43,4 @@ $ vagrant up
 After VM up, vagrant will use ansible provisioner to install gitea and postgresql(if u set postgresql variable in vars.yml)
 Default IP adress and port for gitea: 192.168.33.10:3000
 
-Go to the web broser and enter: http://192.168.33.10:3000
+Go to the web browser and enter: http://192.168.33.10:3000
