@@ -2,7 +2,7 @@
 gitea_service_appname: "Gitea: Welcome to Ramires Gitea instance"
 
 #Change db type to sqlite3 if u want sqlite3 database as backend
-gitea_db_type: postgresql
+gitea_db_type: postgres
 gitea_db_host: 127.0.0.1:5432
 gitea_db_name: gitea
 gitea_db_user: gitea
